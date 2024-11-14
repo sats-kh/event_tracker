@@ -62,8 +62,39 @@ def write_drag_data(data):
         for index, position in enumerate(circle_positions, ):
             writer.writerow([index + 1, position['x'], position['y'], drag_positions[index]['startX'], drag_positions[index]['startY'],drag_positions[index]['endX'], drag_positions[index]['endY']])
         writer.writerow(['Total Drags', 'Total Circles', 'Success Rate'])
-        writer.writerow([total_drags - 1, total_circles, total_drags/total_circles * 100])
+        writer.writerow([total_drags - 1, total_circles, total_drags/total_circles * 100 ])
 
+def write_swipe_data(data):
+    total_swipes = data.get('totalSwipes', 0)
+    total_circles = data.get('totalCircles', 10)
+    duration = data.get('duration', 'N/A')
+    circle_positions = data.get('circlePositions', [])
+    swipe_positions = data.get('swipePositions', [])
+    test_type = data.get('testType', 'swipe')
+
+    # Get current time in Korea Standard Time (KST)
+    kst = pytz.timezone('Asia/Seoul')
+    current_time = datetime.now(kst).strftime('%Y-%m-%d_%H-%M-%S')
+
+    # Prepare filename in the static/results directory
+    filename = f"{current_time}_{test_type}.csv"
+    filepath = os.path.join('static', 'results', filename)
+
+    # Write data to CSV file
+    with open(filepath, 'w', newline='') as file:
+        writer = csv.writer(file)
+
+        # Write circle positions
+        writer.writerow(['Circle Index', 'Circle X', 'Circle Y', 'Swipe-startX', 'Swipe-startY', 'Swipe-endX', 'Swipe-endY'])
+        for index, position in enumerate(circle_positions):
+            writer.writerow([index + 1, position['x'], position['y'], 
+                             swipe_positions[index]['startX'], swipe_positions[index]['startY'], 
+                             swipe_positions[index]['endX'], swipe_positions[index]['endY']])
+
+        # Write summary data
+        writer.writerow(['Total Swipes', 'Total Circles', 'Success Rate'])
+        writer.writerow([total_swipes, total_circles, (total_swipes / total_circles) * 100])
+    
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -88,6 +119,8 @@ def save_results():
         write_click_data(data)
     elif data['testType'] == 'drag':
         write_drag_data(data)
+    else:
+        write_swipe_data(data)
       
     return jsonify({"status": "success"})
 
