@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Viewing {{ filename }}</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Viewing {{ filename }}</h1>
+    
+    {% if rows %}
+        <table>
+            <tr>
+                {% for header in rows[0] %}
+                    <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in rows[1:] %}
+                <tr>
+                    {% for cell in row %}
+                        <td>{{ cell }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>No data available in this file.</p>
+    {% endif %}
+    <div style="margin-top: 20px;"> </div>
+    <button onclick="window.location.href='{{ url_for('list_results') }}'" style="padding: 15px 30px; font-size: 18px;">Back to Results</button>
+</body>
+</html>

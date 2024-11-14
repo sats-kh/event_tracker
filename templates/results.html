@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Results</title>
+</head>
+<body>
+    <h1>Test Results</h1>
+    
+    <ul>
+        {% for file in files %}
+        <li><a href="{{ url_for('view_file', filename=file) }}">{{ file }}</a></li>
+        {% endfor %}
+    </ul>
+    <div style="margin-top: 20px;"> </div>
+    <button onclick="window.location.href='{{ url_for('index') }}'" style="padding: 15px 30px; font-size: 18px; ">Go to Main Page</button>
+</body>
+</html>

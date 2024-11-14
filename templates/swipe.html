@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Touch Event Tracker (Swipe)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+            overflow: hidden;
+        }
+
+        #output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 50%;
+            text-align: center;
+        }
+
+        #dragCount {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 50%;
+            text-align: center;
+            background-color: #f9f9f9;
+        }
+
+        .circle {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: red;
+            cursor: grab;
+        }
+
+        .circle.dragging {
+            cursor: grabbing;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            width: 50%;
+            text-align: center;
+            background-color: #e6f7e6;
+            display: none;
+        }
+
+        #mainButton {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+            cursor: pointer;
+            background-color: #4caf50;
+            color: white;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Touch Event Tracker (Swipe)</h1>
+    <div id="output">Touch coordinates will appear here</div>
+    <div id="dragCount">Total Swipes on Circles: 0</div>
+    <div id="result"></div>
+    <div id="mainButton">Return to Main Screen</div>
+
+    <script>
+        const outputDiv = document.getElementById('output');
+        const dragCountDiv = document.getElementById('dragCount');
+        const resultDiv = document.getElementById('result');
+        const mainButton = document.getElementById('mainButton');
+        const circlePositions = [];
+        const swipePositions = [];
+        let totalSwipes = 0;
+        let totalCircles = 0;
+
+        function updateOutput(eventType, info) {
+            outputDiv.innerHTML = `Event: ${eventType}, ${info}`;
+        }
+
+        function createRandomCircle() {
+            if (totalCircles >= 10) return;
+
+            const circle = document.createElement('div');
+            circle.classList.add('circle');
+
+            const x = Math.random() * (window.innerWidth - 50);
+            const y = Math.random() * (window.innerHeight - 50);
+            circle.style.left = `${x}px`;
+            circle.style.top = `${y}px`;
+
+            circlePositions.push({ x: x.toFixed(2), y: y.toFixed(2) });
+
+            let swipeStart = { x: 0, y: 0 };
+            let offsetX, offsetY;
+
+            circle.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                swipeStart = { x: touch.clientX, y: touch.clientY };
+                offsetX = touch.clientX - circle.offsetLeft;
+                offsetY = touch.clientY - circle.offsetTop;
+
+                circle.classList.add('dragging');
+                updateOutput('Swipe Start', `X: ${swipeStart.x}, Y: ${swipeStart.y}`);
+
+                document.addEventListener('touchmove', handleSwipeMove);
+                document.addEventListener('touchend', handleSwipeEnd);
+            });
+
+            function handleSwipeMove(e) {
+                const touch = e.touches[0];
+                const newX = touch.clientX - offsetX;
+                const newY = touch.clientY - offsetY;
+                circle.style.left = `${newX}px`;
+                circle.style.top = `${newY}px`;
+            }
+
+            function handleSwipeEnd(e) {
+                const touch = e.changedTouches[0];
+                const swipeEnd = { x: touch.clientX, y: touch.clientY };
+                updateOutput('Swipe End', `X: ${swipeEnd.x}, Y: ${swipeEnd.y}`);
+                circle.classList.remove('dragging');
+
+                if (Math.abs(swipeEnd.x - swipeStart.x) > 5 || Math.abs(swipeEnd.y - swipeStart.y) > 5) {
+                    circle.style.backgroundColor = 'green';
+                    totalSwipes++;
+                    dragCountDiv.innerHTML = `Total Swipes on Circles: ${totalSwipes}`;
+                    swipePositions.push({ startX: swipeStart.x, startY: swipeStart.y, endX: swipeEnd.x, endY: swipeEnd.y });
+                } else {
+                    swipePositions.push({ startX: 0, startY: 0, endX: 0, endY: 0 });
+                }
+
+                document.removeEventListener('touchmove', handleSwipeMove);
+                document.removeEventListener('touchend', handleSwipeEnd);
+            }
+
+            document.body.appendChild(circle);
+            totalCircles++;
+
+            setTimeout(() => {
+                circle.remove();
+                if (swipePositions.length < totalCircles) {
+                    swipePositions.push({ startX: 0, startY: 0, endX: 0, endY: 0 });
+                }
+                if (totalCircles === 10) {
+                    showResult();
+                }
+            }, 3000);
+        }
+
+        const circleInterval = setInterval(() => {
+            createRandomCircle();
+            if (totalCircles >= 10) {
+                clearInterval(circleInterval);
+            }
+        }, 3000);
+
+        function showResult() {
+            const successRate = ((totalSwipes / totalCircles) * 100).toFixed(2);
+            resultDiv.innerHTML = `Success Rate: ${successRate}%`;
+            resultDiv.style.display = 'block';
+            mainButton.style.display = 'block';
+        }
+
+        mainButton.addEventListener('click', () => {
+            const duration = "N/A";
+            const data = {
+                totalSwipes: totalSwipes,
+                totalCircles: totalCircles,
+                duration: duration,
+                circlePositions: circlePositions,
+                swipePositions: swipePositions,
+                testType: 'swipe'
+            };
+
+            fetch('/save_results', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === "success") {
+                        resultDiv.style.display = 'none';
+                        mainButton.style.display = 'none';
+                        totalSwipes = 0;
+                        totalCircles = 0;
+                        dragCountDiv.innerHTML = `Total Swipes on Circles: ${totalSwipes}`;
+                        outputDiv.innerHTML = 'Touch coordinates will appear here';
+
+                        circlePositions.length = 0;
+                        swipePositions.length = 0;
+
+                        window.location.href = '/';
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
