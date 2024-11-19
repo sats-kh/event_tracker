@@ -93,6 +93,7 @@
 
             const circle = document.createElement('div');
             circle.classList.add('circle');
+            circle.dataset.swiped = 'false'; // Track swipe status
 
             const x = Math.random() * (window.innerWidth - 50);
             const y = Math.random() * (window.innerHeight - 50);
@@ -105,6 +106,8 @@
             let offsetX, offsetY;
 
             circle.addEventListener('touchstart', (e) => {
+                if (circle.dataset.swiped === 'true') return; // Prevent swiping if already swiped
+
                 const touch = e.touches[0];
                 swipeStart = { x: touch.clientX, y: touch.clientY };
                 offsetX = touch.clientX - circle.offsetLeft;
@@ -126,18 +129,21 @@
             }
 
             function handleSwipeEnd(e) {
-                const touch = e.changedTouches[0];
-                const swipeEnd = { x: touch.clientX, y: touch.clientY };
-                updateOutput('Swipe End', `X: ${swipeEnd.x}, Y: ${swipeEnd.y}`);
-                circle.classList.remove('dragging');
+                if (circle.dataset.swiped === 'false') {
+                    const touch = e.changedTouches[0];
+                    const swipeEnd = { x: touch.clientX, y: touch.clientY };
+                    updateOutput('Swipe End', `X: ${swipeEnd.x}, Y: ${swipeEnd.y}`);
+                    circle.classList.remove('dragging');
 
-                if (Math.abs(swipeEnd.x - swipeStart.x) > 5 || Math.abs(swipeEnd.y - swipeStart.y) > 5) {
-                    circle.style.backgroundColor = 'green';
-                    totalSwipes++;
-                    dragCountDiv.innerHTML = `Total Swipes on Circles: ${totalSwipes}`;
-                    swipePositions.push({ startX: swipeStart.x, startY: swipeStart.y, endX: swipeEnd.x, endY: swipeEnd.y });
-                } else {
-                    swipePositions.push({ startX: 0, startY: 0, endX: 0, endY: 0 });
+                    if (Math.abs(swipeEnd.x - swipeStart.x) > 5 || Math.abs(swipeEnd.y - swipeStart.y) > 5) {
+                        circle.style.backgroundColor = 'green';
+                        circle.dataset.swiped = 'true'; // Mark as swiped
+                        totalSwipes++;
+                        dragCountDiv.innerHTML = `Total Swipes on Circles: ${totalSwipes}`;
+                        swipePositions.push({ startX: swipeStart.x, startY: swipeStart.y, endX: swipeEnd.x, endY: swipeEnd.y });
+                    } else {
+                        swipePositions.push({ startX: 0, startY: 0, endX: 0, endY: 0 });
+                    }
                 }
 
                 document.removeEventListener('touchmove', handleSwipeMove);

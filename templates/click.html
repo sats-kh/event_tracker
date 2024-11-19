@@ -3,8 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, 
-initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mouse Event Tracker</title>
     <style>
         body {
@@ -116,14 +115,18 @@ initial-scale=1.0">
             // Save the circle position
             circlePositions.push({ x: x.toFixed(2), y: y.toFixed(2) });
 
+            // Add a clicked flag to the circle to track if it has been clicked
+            circle.dataset.clicked = 'false';
+
             // Handle click on the circle
             circle.addEventListener('click', (e) => {
-                circle.style.backgroundColor = 'green';
-                totalClicks++;
-                clickCountDiv.innerHTML = `Total Clicks on Circles: ${totalClicks}`;
-
-                // Save the click position
-                clickPositions.push({ x: e.clientX, y: e.clientY });
+                if (circle.dataset.clicked === 'false') {
+                    circle.style.backgroundColor = 'green';
+                    totalClicks++;
+                    clickCountDiv.innerHTML = `Total Clicks on Circles: ${totalClicks}`;
+                    circle.dataset.clicked = 'true'; // Mark as clicked
+                    clickPositions.push({ x: e.clientX, y: e.clientY });
+                }
             });
 
             // Append circle to the body
@@ -157,12 +160,10 @@ initial-scale=1.0">
             resultDiv.innerHTML = `Success Rate: ${successRate}%`;
             resultDiv.style.display = 'block';
             mainButton.style.display = 'block';
-            console.log("Result and main button are displayed."); // Debugging
         }
 
         // Return to main screen button functionality
         mainButton.addEventListener('click', () => {
-            console.log("Main button clicked."); // Debugging
             const duration = "N/A";  // Replace with the actual duration if you have it
             const data = {
                 totalClicks: totalClicks,
@@ -193,7 +194,7 @@ initial-scale=1.0">
                         // Clear stored positions for a new test
                         circlePositions.length = 0;
                         clickPositions.length = 0;
-                
+
                         window.location.href = '/';
                     }
                 })

@@ -94,6 +94,7 @@
 
             const circle = document.createElement('div');
             circle.classList.add('circle');
+            circle.dataset.draged = 'false'; // Track drag status
 
             // Set random position for the circle
             const x = Math.random() * (window.innerWidth - 50);
@@ -110,6 +111,8 @@
 
             // Handle drag start on mousedown
             circle.addEventListener('mousedown', (e) => {
+                if (circle.dataset.draged === 'true') return; // Prevent dragging if already dragged
+
                 dragStart = { x: e.clientX, y: e.clientY };
                 offsetX = e.clientX - circle.offsetLeft;
                 offsetY = e.clientY - circle.offsetTop;
@@ -133,22 +136,20 @@
             // Drag end event handler
             function handleDragEnd(e) {
                 const dragEnd = { x: e.clientX, y: e.clientY };
-                updateOutput('Drag End', `X: ${dragEnd.x}, Y: ${dragEnd.y}`);
-                circle.classList.remove('dragging');
-                
-                // Register as a drag only if the circle was moved
-                if (Math.abs(dragEnd.x - dragStart.x) > 5 || Math.abs(dragEnd.y - dragStart.y) > 5) {
-                    circle.style.backgroundColor = 'green';
-                    totalDrags++;
-                    dragCountDiv.innerHTML = `Total Drags on Circles: ${totalDrags}`;
 
-                    // Save the drag start and end positions
-                    dragPositions.push({ startX: dragStart.x, startY: dragStart.y, endX: dragEnd.x, endY: dragEnd.y });
-                } else {
-                    // No significant drag, record as a missed drag
-                    dragPositions.push({ startX: 0, startY: 0, endX: 0, endY: 0 });
+                if (circle.dataset.draged === 'false') {
+                    if (Math.abs(dragEnd.x - dragStart.x) > 5 || Math.abs(dragEnd.y - dragStart.y) > 5) {
+                        circle.style.backgroundColor = 'green';
+                        circle.dataset.draged = 'true'; // Mark as dragged
+                        totalDrags++;
+                        dragCountDiv.innerHTML = `Total Drags on Circles: ${totalDrags}`;
+
+                        // Save the drag start and end positions
+                        dragPositions.push({ startX: dragStart.x, startY: dragStart.y, endX: dragEnd.x, endY: dragEnd.y });
+                    }
                 }
 
+                circle.classList.remove('dragging');
                 document.removeEventListener('mousemove', handleDragMove);
                 document.removeEventListener('mouseup', handleDragEnd);
             }
