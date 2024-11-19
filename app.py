@@ -111,6 +111,10 @@ def tap():
 def swipe():
     return render_template('swipe.html')
 
+# @app.route('/swipe_using_drag')
+# def swipe_using_drag():
+#     return render_template('swipe_using_drag.html')
+
 @app.route('/save_results', methods=['POST'])
 def save_results():
     data = request.get_json()
