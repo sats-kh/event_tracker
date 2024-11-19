@@ -35,7 +35,7 @@ def write_click_data(data):
         for index, position in enumerate(circle_positions, ):
             writer.writerow([index + 1, position['x'], position['y'], click_positions[index]['x'], click_positions[index]['y']])
         writer.writerow(['Total Clicks', 'Total Circles', 'Success Rate'])
-        writer.writerow([total_clicks - 1, total_circles, total_clicks/total_circles * 100])
+        writer.writerow([total_clicks, total_circles, total_clicks/total_circles * 100])
 
 def write_drag_data(data):
     total_drags = data.get('totalDrags', 0)
@@ -62,7 +62,7 @@ def write_drag_data(data):
         for index, position in enumerate(circle_positions, ):
             writer.writerow([index + 1, position['x'], position['y'], drag_positions[index]['startX'], drag_positions[index]['startY'],drag_positions[index]['endX'], drag_positions[index]['endY']])
         writer.writerow(['Total Drags', 'Total Circles', 'Success Rate'])
-        writer.writerow([total_drags - 1, total_circles, total_drags/total_circles * 100 ])
+        writer.writerow([total_drags, total_circles, total_drags/total_circles * 100 ])
 
 def write_swipe_data(data):
     total_swipes = data.get('totalSwipes', 0)

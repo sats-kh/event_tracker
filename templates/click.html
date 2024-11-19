@@ -141,7 +141,10 @@
                     clickPositions.push({ x: 0, y: 0 });
                 }
                 if (totalCircles === 10) {
-                    showResult();
+                    // Delay for 4 seconds before showing the result
+                    setTimeout(() => {
+                        showResult();
+                    }, 4000);
                 }
             }, 3000);
         }

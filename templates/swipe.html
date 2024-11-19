@@ -159,7 +159,10 @@
                     swipePositions.push({ startX: 0, startY: 0, endX: 0, endY: 0 });
                 }
                 if (totalCircles === 10) {
-                    showResult();
+                    // Delay for 4 seconds before showing the result
+                    setTimeout(() => {
+                        showResult();
+                    }, 4000);
                 }
             }, 3000);
         }
