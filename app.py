@@ -9,90 +9,77 @@ app = Flask(__name__)
 # Ensure the results directory exists within static
 os.makedirs(os.path.join(app.static_folder, 'results'), exist_ok=True)
 
-
 def write_click_data(data):
     total_clicks = data.get('totalClicks', 0)
     total_circles = data.get('totalCircles', 10)
-    duration = data.get('duration', 'N/A')
     circle_positions = data.get('circlePositions', [])
     click_positions = data.get('clickPositions', [])
-    test_type = data.get('testType', 'test')
 
-    # Get current time in Korea Standard Time (KST)
+    # Ensure click_positions and circle_positions are synchronized
+    for _ in range(len(circle_positions) - len(click_positions)):
+        click_positions.append({'x': 0, 'y': 0})
+
+    # Prepare CSV file
     kst = pytz.timezone('Asia/Seoul')
     current_time = datetime.now(kst).strftime('%Y-%m-%d_%H-%M-%S')
-
-    # Prepare filename in the static/results directory
-    filename = f"{current_time}_{test_type}.csv"
+    filename = f"{current_time}_click.csv"
     filepath = os.path.join(app.static_folder, 'results', filename)
 
-    # Write data to CSV file
     with open(filepath, 'w', newline='') as file:
         writer = csv.writer(file)
-                        
-        # Write circle positions
-        writer.writerow(['Circle Index', 'Circle X', 'Circle Y', 'User X', 'User Y'])
-        for index, position in enumerate(circle_positions, ):
-            writer.writerow([index + 1, position['x'], position['y'], click_positions[index]['x'], click_positions[index]['y']])
-        writer.writerow(['Total Clicks', 'Total Circles', 'Success Rate'])
-        writer.writerow([total_clicks, total_circles, total_clicks/total_circles * 100])
+        writer.writerow(['Index', 'Circle X', 'Circle Y', 'User X', 'User Y'])
+        for index, position in enumerate(circle_positions):
+            click_pos = click_positions[index]
+            writer.writerow([index + 1, position['x'], position['y'], click_pos['x'], click_pos['y']])
+        writer.writerow(['Total Clicks', 'Total Circles', 'Success Rate (%)'])
+        writer.writerow([total_clicks, total_circles, (total_clicks / total_circles) * 100])
 
 def write_drag_data(data):
     total_drags = data.get('totalDrags', 0)
     total_circles = data.get('totalCircles', 10)
-    duration = data.get('duration', 'N/A')
     circle_positions = data.get('circlePositions', [])
     drag_positions = data.get('dragPositions', [])
-    test_type = data.get('testType', 'test')
 
-    # Get current time in Korea Standard Time (KST)
+    # Ensure drag_positions and circle_positions are synchronized
+    for _ in range(len(circle_positions) - len(drag_positions)):
+        drag_positions.append({'startX': 0, 'startY': 0, 'endX': 0, 'endY': 0})
+
     kst = pytz.timezone('Asia/Seoul')
     current_time = datetime.now(kst).strftime('%Y-%m-%d_%H-%M-%S')
-
-    # Prepare filename in the static/results directory
-    filename = f"{current_time}_{test_type}.csv"
+    filename = f"{current_time}_drag.csv"
     filepath = os.path.join(app.static_folder, 'results', filename)
 
-    # Write data to CSV file
     with open(filepath, 'w', newline='') as file:
         writer = csv.writer(file)
-                        
-        # Write circle positions
-        writer.writerow(['Circle Index', 'Circle X', 'Circle Y', 'User-startX', 'User-startY', 'User-endX', 'User-endY'])
-        for index, position in enumerate(circle_positions, ):
-            writer.writerow([index + 1, position['x'], position['y'], drag_positions[index]['startX'], drag_positions[index]['startY'],drag_positions[index]['endX'], drag_positions[index]['endY']])
-        writer.writerow(['Total Drags', 'Total Circles', 'Success Rate'])
-        writer.writerow([total_drags, total_circles, total_drags/total_circles * 100 ])
+        writer.writerow(['Index', 'Circle X', 'Circle Y', 'User-startX', 'User-startY', 'User-endX', 'User-endY'])
+        for index, position in enumerate(circle_positions):
+            drag_pos = drag_positions[index]
+            writer.writerow([index + 1, position['x'], position['y'], drag_pos['startX'], drag_pos['startY'], drag_pos['endX'], drag_pos['endY']])
+        writer.writerow(['Total Drags', 'Total Circles', 'Success Rate (%)'])
+        writer.writerow([total_drags, total_circles, (total_drags / total_circles) * 100])
 
 def write_swipe_data(data):
     total_swipes = data.get('totalSwipes', 0)
     total_circles = data.get('totalCircles', 10)
-    duration = data.get('duration', 'N/A')
     circle_positions = data.get('circlePositions', [])
     swipe_positions = data.get('swipePositions', [])
-    test_type = data.get('testType', 'swipe')
 
-    # Get current time in Korea Standard Time (KST)
+    # Ensure swipe_positions and circle_positions are synchronized
+    for _ in range(len(circle_positions) - len(swipe_positions)):
+        swipe_positions.append({'startX': 0, 'startY': 0, 'endX': 0, 'endY': 0})
+
     kst = pytz.timezone('Asia/Seoul')
     current_time = datetime.now(kst).strftime('%Y-%m-%d_%H-%M-%S')
+    filename = f"{current_time}_swipe.csv"
+    filepath = os.path.join(app.static_folder, 'results', filename)
 
-    # Prepare filename in the static/results directory
-    filename = f"{current_time}_{test_type}.csv"
-    filepath = os.path.join('static', 'results', filename)
-
-    # Write data to CSV file
     with open(filepath, 'w', newline='') as file:
         writer = csv.writer(file)
-
-        # Write circle positions
-        writer.writerow(['Circle Index', 'Circle X', 'Circle Y', 'Swipe-startX', 'Swipe-startY', 'Swipe-endX', 'Swipe-endY'])
+        writer.writerow(['Index', 'Circle X', 'Circle Y', 'Swipe-startX', 'Swipe-startY', 'Swipe-endX', 'Swipe-endY'])
         for index, position in enumerate(circle_positions):
-            writer.writerow([index + 1, position['x'], position['y'], 
-                             swipe_positions[index]['startX'], swipe_positions[index]['startY'], 
-                             swipe_positions[index]['endX'], swipe_positions[index]['endY']])
-
-        # Write summary data
-        writer.writerow(['Total Swipes', 'Total Circles', 'Success Rate'])
+            swipe_pos = swipe_positions[index]
+            writer.writerow([index + 1, position['x'], position['y'], swipe_pos['startX'], swipe_pos['startY'], swipe_pos['endX'], swipe_pos['endY']])
+        writer.writerow(['Total Swipes', 'Total Circles', 'Success Rate (%)'])
         writer.writerow([total_swipes, total_circles, (total_swipes / total_circles) * 100])
     
 @app.route('/')
