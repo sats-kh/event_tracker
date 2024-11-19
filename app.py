@@ -91,16 +91,16 @@ def click():
     return render_template('click.html')
 
 @app.route('/drag')
-def tap():
+def drag():
     return render_template('drag.html')
 
 @app.route('/swipe')
 def swipe():
     return render_template('swipe.html')
 
-# @app.route('/swipe_using_drag')
-# def swipe_using_drag():
-#     return render_template('swipe_using_drag.html')
+@app.route('/two_finger_swipe')
+def two_finger_swipe():
+    return render_template('two_finger_swipe.html')
 
 @app.route('/save_results', methods=['POST'])
 def save_results():

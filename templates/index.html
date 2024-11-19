@@ -10,8 +10,9 @@
     <h1>Select an Action</h1>
     <div class="button-container">
         <a href="{{ url_for('click') }}" class="button" style="padding: 15px 30px; font-size: 18px; ">Click</a>
-        <a href="{{ url_for('tap') }}" class="button" style="padding: 15px 30px; font-size: 18px; ">Drag</a>
+        <a href="{{ url_for('drag') }}" class="button" style="padding: 15px 30px; font-size: 18px; ">Drag</a>
         <a href="{{ url_for('swipe') }}" class="button" style="padding: 15px 30px; font-size: 18px; ">Swipe</a>
+        <a href="{{ url_for('two_finger_swipe') }}" class="button" style="padding: 15px 30px; font-size: 18px; ">Two-Finger <br> Swipe</a>
     </div>
     <a href="{{ url_for('list_results') }}" class="button" style="padding: 15px 30px; font-size: 18px; ">View Results</a>
 </body>

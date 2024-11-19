@@ -23,13 +23,14 @@
         const swipePositions = [];
         let totalSwipes = 0;
         let totalCircles = 0;
+        const num_circles = 10;
     
         function updateOutput(eventType, info) {
             outputDiv.innerHTML = `Event: ${eventType}, ${info}`;
         }
     
         function createRandomCircle() {
-            if (totalCircles >= 10) return;
+            if (totalCircles >= num_circles) return;
     
             const circle = document.createElement('div');
             circle.classList.add('circle');
@@ -92,7 +93,7 @@
                 if (swipePositions.length < totalCircles) {
                     swipePositions[totalCircles - 1] = { startX: 0, startY: 0, endX: 0, endY: 0 };
                 }
-                if (totalCircles === 10) {
+                if (totalCircles === num_circles) {
                     setTimeout(showResult, 3800);
                 }
             }, 3000);
@@ -100,7 +101,7 @@
     
         const circleInterval = setInterval(() => {
             createRandomCircle();
-            if (totalCircles >= 10) {
+            if (totalCircles >= num_circles) {
                 clearInterval(circleInterval);
             }
         }, 3000);
