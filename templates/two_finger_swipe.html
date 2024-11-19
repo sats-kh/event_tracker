@@ -22,81 +22,81 @@
         const mainButton = document.getElementById('mainButton');
         let totalSwipes = 0;
         let totalPairs = 0;
-        const num_circles = 10;
-    
+        const num_circles = 2;
+
         function updateOutput(eventType, info) {
             outputDiv.innerHTML = `Event: ${eventType}, ${info}`;
         }
-    
+
         function createCirclePair() {
             if (totalPairs >= num_circles) return; // Stop creating new pairs if totalPairs reaches num_circles
-    
+
             totalPairs++; // Increment totalPairs immediately to avoid multiple executions
-    
+
             const circle1 = document.createElement('div');
             const circle2 = document.createElement('div');
             circle1.classList.add('circle');
             circle2.classList.add('circle');
-    
+
             const x = Math.random() * (window.innerWidth - 100);
             const y1 = Math.random() * (window.innerHeight / 2 - 100);
             const y2 = y1 + 100; // Second circle is 100px below the first
-    
+
             circle1.style.left = `${x}px`;
             circle1.style.top = `${y1}px`;
             circle2.style.left = `${x}px`;
             circle2.style.top = `${y2}px`;
-    
+
             circle1.dataset.swiped = "false"; // Add a data attribute to track swipe status
             circle2.dataset.swiped = "false"; // Add a data attribute to track swipe status
-    
+
             document.body.appendChild(circle1);
             document.body.appendChild(circle2);
-    
+
             let startTouches = null;
             let movedCircle1 = false;
             let movedCircle2 = false;
-    
+
             function handleTouchStart(e) {
                 if (e.touches.length !== 2) return; // Ensure two-finger touch only
                 if (circle1.dataset.swiped === "true" || circle2.dataset.swiped === "true") return; // Skip if already swiped
-    
+
                 startTouches = {
                     circle1: { x: e.touches[0].clientX, y: e.touches[0].clientY },
                     circle2: { x: e.touches[1].clientX, y: e.touches[1].clientY },
                 };
-    
+
                 updateOutput(
                     'Swipe Start',
                     `Circle 1: (${startTouches.circle1.x}, ${startTouches.circle1.y}), Circle 2: (${startTouches.circle2.x}, ${startTouches.circle2.y})`
                 );
             }
-    
+
             function handleTouchMove(e) {
                 if (e.touches.length !== 2 || !startTouches) return; // Ensure valid touch
                 if (circle1.dataset.swiped === "true" || circle2.dataset.swiped === "true") return; // Skip if already swiped
-    
+
                 const touch1 = e.touches[0];
                 const touch2 = e.touches[1];
-    
+
                 const delta1X = Math.abs(touch1.clientX - startTouches.circle1.x);
                 const delta1Y = Math.abs(touch1.clientY - startTouches.circle1.y);
                 const delta2X = Math.abs(touch2.clientX - startTouches.circle2.x);
                 const delta2Y = Math.abs(touch2.clientY - startTouches.circle2.y);
-    
+
                 if (delta1X > 10 || delta1Y > 10) {
                     circle1.style.left = `${touch1.clientX - 50}px`;
                     circle1.style.top = `${touch1.clientY - 50}px`;
                     movedCircle1 = true;
                 }
-    
+
                 if (delta2X > 10 || delta2Y > 10) {
                     circle2.style.left = `${touch2.clientX - 50}px`;
                     circle2.style.top = `${touch2.clientY - 50}px`;
                     movedCircle2 = true;
                 }
             }
-    
+
             function handleTouchEnd() {
                 // 터치가 끝났을 때, 원이 움직였다면 초록색으로 변경
                 if ((movedCircle1 || movedCircle2) && circle1.dataset.swiped === "false" && circle2.dataset.swiped === "false") {
@@ -107,41 +107,41 @@
                     totalSwipes++;
                     dragCountDiv.innerHTML = `Total Successful Swipes: ${totalSwipes}`;
                 }
-    
+
                 // Reset touch state
                 startTouches = null;
             }
-    
+
             document.addEventListener('touchstart', handleTouchStart);
             document.addEventListener('touchmove', handleTouchMove);
             document.addEventListener('touchend', handleTouchEnd);
-    
+
             setTimeout(() => {
                 if (document.body.contains(circle1)) document.body.removeChild(circle1);
                 if (document.body.contains(circle2)) document.body.removeChild(circle2);
-    
+
                 if (totalPairs === num_circles) {
-                    showResult();
+                    setTimeout(showResult, 5800);
                 }
-    
+
                 // 이벤트 제거
                 document.removeEventListener('touchstart', handleTouchStart);
                 document.removeEventListener('touchmove', handleTouchMove);
                 document.removeEventListener('touchend', handleTouchEnd);
             }, 5000); // Remove after 5 seconds
         }
-    
+
         function showResult() {
             const successRate = ((totalSwipes / num_circles) * 100).toFixed(2);
             resultDiv.innerHTML = `Success Rate: ${successRate}%`;
             resultDiv.style.display = 'block';
             mainButton.style.display = 'block';
         }
-    
+
         mainButton.addEventListener('click', () => {
             window.location.href = '/';
         });
-    
+
         const circleInterval = setInterval(() => {
             if (totalPairs < num_circles) {
                 createCirclePair();
@@ -150,8 +150,8 @@
             }
         }, 5000); // Create a new pair every 5 seconds
     </script>
-    
-    
+
+
 </body>
 
 </html>

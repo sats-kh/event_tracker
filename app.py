@@ -81,7 +81,49 @@ def write_swipe_data(data):
             writer.writerow([index + 1, position['x'], position['y'], swipe_pos['startX'], swipe_pos['startY'], swipe_pos['endX'], swipe_pos['endY']])
         writer.writerow(['Total Swipes', 'Total Circles', 'Success Rate (%)'])
         writer.writerow([total_swipes, total_circles, (total_swipes / total_circles) * 100])
-    
+
+def write_two_finger_swipe_data(data):
+    total_swipes = data.get('totalSwipes', 0)
+    total_circles = data.get('totalCircles', 10)
+    circle_positions = data.get('circlePositions', [])
+    swipe_positions = data.get('swipePositions', [])
+
+    # Ensure swipe_positions and circle_positions are synchronized
+    for _ in range(len(circle_positions) - len(swipe_positions)):
+        swipe_positions.append({
+            'startX1': 0, 'startY1': 0, 'endX1': 0, 'endY1': 0,
+            'startX2': 0, 'startY2': 0, 'endX2': 0, 'endY2': 0
+        })
+
+    kst = pytz.timezone('Asia/Seoul')
+    current_time = datetime.now(kst).strftime('%Y-%m-%d_%H-%M-%S')
+    filename = f"{current_time}_two_finger_swipe.csv"
+    filepath = os.path.join(app.static_folder, 'results', filename)
+
+    with open(filepath, 'w', newline='') as file:
+        writer = csv.writer(file)
+        # Header
+        writer.writerow([
+            'Index', 
+            'Circle1 X', 'Circle1 Y', 
+            'Circle2 X', 'Circle2 Y', 
+            'User-startX1', 'User-startY1', 'User-endX1', 'User-endY1',
+            'User-startX2', 'User-startY2', 'User-endX2', 'User-endY2'
+        ])
+        # Write data
+        for index, position in enumerate(circle_positions):
+            swipe_pos = swipe_positions[index]
+            writer.writerow([
+                index + 1,
+                position['circle1']['x'], position['circle1']['y'],  # Circle 1 Position
+                position['circle2']['x'], position['circle2']['y'],  # Circle 2 Position
+                swipe_pos['startX1'], swipe_pos['startY1'], swipe_pos['endX1'], swipe_pos['endY1'],  # Swipe for Circle 1
+                swipe_pos['startX2'], swipe_pos['startY2'], swipe_pos['endX2'], swipe_pos['endY2']   # Swipe for Circle 2
+            ])
+        # Summary
+        writer.writerow(['Total Swipes', 'Total Circles', 'Success Rate (%)'])
+        writer.writerow([total_swipes, total_circles, (total_swipes / total_circles) * 100])
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -110,8 +152,10 @@ def save_results():
         write_click_data(data)
     elif data['testType'] == 'drag':
         write_drag_data(data)
-    else:
+    elif data['testType'] == 'swipe':
         write_swipe_data(data)
+    else:
+        write_two_finger_swipe_data(data)
 
     return jsonify({"status": "success"})
 
