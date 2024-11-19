@@ -121,7 +121,7 @@ def save_results():
         write_drag_data(data)
     else:
         write_swipe_data(data)
-      
+
     return jsonify({"status": "success"})
 
 @app.route('/results')
