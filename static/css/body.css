@@ -6,6 +6,10 @@ body {
     margin-top: 50px;
     overflow: hidden;
 }
+h1 {
+    margin-bottom: 20px;
+    text-align: center; /* 텍스트 중앙 정렬 */
+}
 
 #output {
     margin-top: 20px;

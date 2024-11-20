@@ -1,0 +1,7 @@
+Index,Circle1 X,Circle1 Y,Circle2 X,Circle2 Y,Start X1,Start Y1,End X1,End Y1,Start X2,Start Y2,End X2,End Y2
+1,77.00,117.43,77.00,217.43,140.00,253.00,140.00,521.00,139.00,156.00,134.00,405.00
+2,49.46,98.35,49.46,198.35,114.00,237.00,116.00,391.00,110.00,123.00,120.00,297.00
+
+Summary
+Total Swipes,Total Pairs,Success Rate (%)
+2,2,100.00

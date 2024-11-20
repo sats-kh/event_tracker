@@ -74,7 +74,11 @@
                     circle1: { x: e.touches[0].clientX, y: e.touches[0].clientY },
                     circle2: { x: e.touches[1].clientX, y: e.touches[1].clientY },
                 };
-
+                // swipePositions.push({
+                //     Circle1: { Circle1_startX: startTouches.circle1.x.toFixed(2), Circle1_startY: startTouches.circle1.y.toFixed(2), Circle1_endX: 0, Circle1_endY: 0 },
+                //     Circle2: { Circle2_startX: startTouches.circle2.x.toFixed(2), Circle2_startY: startTouches.circle2.y.toFixed(2), Circle2_endX: 0, Circle2_endY: 0 }
+                // });
+                // Update start positions in swipePositions
                 swipePositions[index].Circle1.Circle1_startX = startTouches.circle1.x.toFixed(2);
                 swipePositions[index].Circle1.Circle1_startY = startTouches.circle1.y.toFixed(2);
                 swipePositions[index].Circle2.Circle2_startX = startTouches.circle2.x.toFixed(2);
@@ -104,18 +108,13 @@
                     circle1.style.left = `${touch1.clientX - 50}px`;
                     circle1.style.top = `${touch1.clientY - 50}px`;
                     movedCircle1 = true;
-                    // Update end positions for Circle1
-                    swipePositions[index].Circle1.Circle1_endX = touch1.clientX.toFixed(2);
-                    swipePositions[index].Circle1.Circle1_endY = touch1.clientY.toFixed(2);
+
                 }
 
                 if (delta2X > 10 || delta2Y > 10) {
                     circle2.style.left = `${touch2.clientX - 50}px`;
                     circle2.style.top = `${touch2.clientY - 50}px`;
                     movedCircle2 = true;
-                    // Update end positions for Circle2
-                    swipePositions[index].Circle2.Circle2_endX = touch2.clientX.toFixed(2);
-                    swipePositions[index].Circle2.Circle2_endY = touch2.clientY.toFixed(2);
 
                 }
             }
@@ -145,7 +144,7 @@
                 // 테스트 종료
                 if (totalPairs === num_circles) {
                     // alert(`Circle Positions:\n\n${JSON.stringify(circlePositions, null, 2)}`);
-                    // alert(`Swipe Positions:\n\n${JSON.stringify(swipePositions, null, 2)}`);
+                    alert(`Swipe Positions:\n\n${JSON.stringify(swipePositions, null, 2)}`);
 
                     setTimeout(showResult, 5800);
                 }
@@ -165,38 +164,8 @@
         }
 
         mainButton.addEventListener('click', () => {
-            const data = {
-                totalSwipes: totalSwipes,
-                totalPairs: totalPairs,
-                circlePositions: circlePositions,
-                swipePositions: swipePositions,
-                testType: 'two-finger-swipe',
-            };
-
-            fetch('/save_results', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.status === 'success') {
-                        resultDiv.style.display = 'none';
-                        mainButton.style.display = 'none';
-                        totalSwipes = 0;
-                        totalPairs = 0;
-                        dragCountDiv.innerHTML = `Total Successful Swipes: ${totalSwipes}`;
-                        outputDiv.innerHTML = 'Touch coordinates will appear here';
-                        circlePositions.length = 0;
-                        swipePositions.length = 0;
-                        window.location.href = '/';
-                    }
-                })
-                .catch((error) => console.error('Error:', error));
+            window.location.href = '/';
         });
-
 
         const circleInterval = setInterval(() => {
             if (totalPairs < num_circles) {
