@@ -11,7 +11,7 @@
 <body>
     <h1>Touch Event Tracker (Two-Finger Swipe)</h1>
     <div id="output">Touch coordinates will appear here</div>
-    <div id="dragCount">Total Successful Swipes: 0</div>
+    <div id="dragCount">Test Progress: 0 / 0 | Successful Swipes: 0</div>
     <div id="result"></div>
     <div id="mainButton">Return to Main Screen</div>
 
@@ -22,9 +22,14 @@
         const mainButton = document.getElementById('mainButton');
         let totalSwipes = 0;
         let totalPairs = 0;
-        const num_circles = 20;
+        const num_circles = 50; // Total number of circle pairs for the test
         const circlePositions = [];
         const swipePositions = [];
+
+        // Update progress display
+        function updateProgressDisplay() {
+            dragCountDiv.innerHTML = `Test Progress: ${totalPairs} / ${num_circles} | Successful Swipes: ${totalSwipes}`;
+        }
 
         function updateOutput(eventType, info) {
             outputDiv.innerHTML = `Event: ${eventType}, ${info}`;
@@ -34,6 +39,7 @@
             if (totalPairs >= num_circles) return; // Stop creating new pairs if totalPairs reaches num_circles
 
             totalPairs++; // Increment totalPairs immediately to avoid multiple executions
+            updateProgressDisplay(); // Update progress display when a new pair is created
 
             const circle1 = document.createElement('div');
             const circle2 = document.createElement('div');
@@ -116,22 +122,19 @@
                     // Update end positions for Circle2
                     swipePositions[index].Circle2.Circle2_endX = touch2.clientX.toFixed(2);
                     swipePositions[index].Circle2.Circle2_endY = touch2.clientY.toFixed(2);
-
                 }
             }
 
             function handleTouchEnd() {
-                // 터치가 끝났을 때, 원이 움직였다면 초록색으로 변경
                 if ((movedCircle1 || movedCircle2) && circle1.dataset.swiped === "false" && circle2.dataset.swiped === "false") {
                     circle1.style.backgroundColor = 'green';
                     circle2.style.backgroundColor = 'green';
                     circle1.dataset.swiped = "true"; // Mark as swiped
                     circle2.dataset.swiped = "true"; // Mark as swiped
                     totalSwipes++;
-                    dragCountDiv.innerHTML = `Total Successful Swipes: ${totalSwipes}`;
+                    updateProgressDisplay(); // Update progress display after a successful swipe
                 }
 
-                // Reset touch state
                 startTouches = null;
             }
 
@@ -142,15 +145,11 @@
             setTimeout(() => {
                 if (document.body.contains(circle1)) document.body.removeChild(circle1);
                 if (document.body.contains(circle2)) document.body.removeChild(circle2);
-                // 테스트 종료
-                if (totalPairs === num_circles) {
-                    // alert(`Circle Positions:\n\n${JSON.stringify(circlePositions, null, 2)}`);
-                    // alert(`Swipe Positions:\n\n${JSON.stringify(swipePositions, null, 2)}`);
 
+                if (totalPairs === num_circles) {
                     setTimeout(showResult, 5800);
                 }
 
-                // 이벤트 제거
                 document.removeEventListener('touchstart', handleTouchStart);
                 document.removeEventListener('touchmove', handleTouchMove);
                 document.removeEventListener('touchend', handleTouchEnd);
@@ -187,7 +186,7 @@
                         mainButton.style.display = 'none';
                         totalSwipes = 0;
                         totalPairs = 0;
-                        dragCountDiv.innerHTML = `Total Successful Swipes: ${totalSwipes}`;
+                        dragCountDiv.innerHTML = `Test Progress: ${totalPairs} / ${num_circles} | Successful Swipes: ${totalSwipes}`;
                         outputDiv.innerHTML = 'Touch coordinates will appear here';
                         circlePositions.length = 0;
                         swipePositions.length = 0;
@@ -197,7 +196,6 @@
                 .catch((error) => console.error('Error:', error));
         });
 
-
         const circleInterval = setInterval(() => {
             if (totalPairs < num_circles) {
                 createCirclePair();
@@ -205,6 +203,7 @@
                 clearInterval(circleInterval); // Stop interval when totalPairs reaches num_circles
             }
         }, 5000); // Create a new pair every 5 seconds
+
     </script>
 
 

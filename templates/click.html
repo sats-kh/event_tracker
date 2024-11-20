@@ -11,7 +11,7 @@
 <body>
     <h1>Mouse Event Tracker</h1>
     <div id="output">Mouse coordinates will appear here</div>
-    <div id="clickCount">Total Clicks on Circles: 0</div>
+    <div id="clickCount">Test Progress: 0 / 0 | Successful Clicks: 0</div>
     <div id="result"></div>
     <div id="mainButton">Return to Main Screen</div>
 
@@ -24,54 +24,60 @@
         const clickPositions = []; // Array to hold click coordinates
         let totalClicks = 0;
         let totalCircles = 0;
-        const num_circles = 20;
-    
+        const num_circles = 50; // Adjust this for the number of total circles
+
         function updateOutput(eventType, info) {
             outputDiv.innerHTML = `Event: ${eventType}, ${info}`;
         }
-    
+
+        // Update the progress display
+        function updateProgressDisplay() {
+            clickCountDiv.innerHTML = `Test Progress: ${totalCircles} / ${num_circles} | Successful Clicks: ${totalClicks}`;
+        }
+
         // Mouse Click Event
         document.addEventListener('click', (e) => {
             updateOutput('Click', `X: ${e.clientX}, Y: ${e.clientY}`);
         });
-    
+
         // Mouse Move Event
         document.addEventListener('mousemove', (e) => {
             updateOutput('Move', `X: ${e.clientX}, Y: ${e.clientY}`);
         });
-    
+
         function createRandomCircle() {
             if (totalCircles >= num_circles) return;
-    
+
             const circle = document.createElement('div');
             circle.classList.add('circle');
-    
+
             const x = Math.random() * (window.innerWidth - 50);
             const y = Math.random() * (window.innerHeight - 50);
             circle.style.left = `${x}px`;
             circle.style.top = `${y}px`;
-    
+
             circlePositions.push({ x: x.toFixed(2), y: y.toFixed(2) });
-    
+
             // Add default click position for this circle
             clickPositions.push({ x: 0, y: 0 });
-    
+
             circle.dataset.index = totalCircles;
-    
+
             circle.addEventListener('click', (e) => {
                 const index = parseInt(circle.dataset.index, 10);
-    
+
                 if (clickPositions[index].x === 0 && clickPositions[index].y === 0) {
                     totalClicks++;
-                    clickCountDiv.innerHTML = `Total Clicks on Circles: ${totalClicks}`;
                     clickPositions[index] = { x: e.clientX, y: e.clientY };
                     circle.style.backgroundColor = 'green';
+                    updateProgressDisplay();
                 }
             });
-    
+
             document.body.appendChild(circle);
             totalCircles++;
-    
+            updateProgressDisplay();
+
             setTimeout(() => {
                 circle.remove();
                 if (totalCircles === num_circles) {
@@ -79,19 +85,19 @@
                 }
             }, 3000);
         }
-    
+
         const circleInterval = setInterval(() => {
             createRandomCircle();
             if (totalCircles >= num_circles) clearInterval(circleInterval);
         }, 3000);
-    
+
         function showResult() {
             const successRate = ((totalClicks / totalCircles) * 100).toFixed(2);
             resultDiv.innerHTML = `Success Rate: ${successRate}%`;
             resultDiv.style.display = 'block';
             mainButton.style.display = 'block';
         }
-    
+
         mainButton.addEventListener('click', () => {
             const data = {
                 totalClicks: totalClicks,
@@ -100,7 +106,7 @@
                 clickPositions: clickPositions,
                 testType: 'click',
             };
-    
+
             fetch('/save_results', {
                 method: 'POST',
                 headers: {
@@ -115,7 +121,7 @@
                         mainButton.style.display = 'none';
                         totalClicks = 0;
                         totalCircles = 0;
-                        clickCountDiv.innerHTML = `Total Clicks on Circles: ${totalClicks}`;
+                        clickCountDiv.innerHTML = `Test Progress: ${totalCircles} / ${num_circles} | Successful Clicks: ${totalClicks}`;
                         outputDiv.innerHTML = 'Mouse coordinates will appear here';
                         circlePositions.length = 0;
                         clickPositions.length = 0;
@@ -124,8 +130,9 @@
                 })
                 .catch((error) => console.error('Error:', error));
         });
+
     </script>
- 
+
 </body>
 
 </html>

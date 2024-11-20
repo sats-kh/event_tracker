@@ -1,0 +1,7 @@
+Index,Circle X,Circle Y,User-startX,User-startY,User-endX,User-endY
+1,841.36,836.17,898,893,421,755
+2,1184.68,680.13,1234,746,470,846
+3,150.99,1157.80,0,0,0,0
+
+Total Drags,Total Circles,Success Rate (%)
+2,3,66.66666666666666

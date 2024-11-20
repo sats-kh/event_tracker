@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
 <body>
     <h1>Mouse Event Tracker (Drag)</h1>
     <div id="output">Mouse coordinates will appear here</div>
-    <div id="dragCount">Total Drags on Circles: 0</div>
+    <div id="dragCount">Test Progress: 0 / 0 | Successful Drags: 0</div>
     <div id="result"></div>
     <div id="mainButton">Return to Main Screen</div>
 
@@ -23,75 +24,81 @@
         const dragPositions = []; // Array to hold drag start and end coordinates
         let totalDrags = 0;
         let totalCircles = 0;
-        const num_circles = 20;
-    
+        const num_circles = 50; // Total number of circles to create
+
         function updateOutput(eventType, info) {
             outputDiv.innerHTML = `Event: ${eventType}, ${info}`;
         }
-    
+
+        // Update the progress display
+        function updateProgressDisplay() {
+            dragCountDiv.innerHTML = `Test Progress: ${totalCircles} / ${num_circles} | Successful Drags: ${totalDrags}`;
+        }
+
         function createRandomCircle() {
             if (totalCircles >= num_circles) return;
-    
+
             const circle = document.createElement('div');
             circle.classList.add('circle');
             circle.dataset.dragged = 'false';
-    
+
             const x = Math.random() * (window.innerWidth - 50);
             const y = Math.random() * (window.innerHeight - 50);
             circle.style.left = `${x}px`;
             circle.style.top = `${y}px`;
-    
+
             circlePositions.push({ x: x.toFixed(2), y: y.toFixed(2) });
             dragPositions.push({ startX: 0, startY: 0, endX: 0, endY: 0 }); // Default drag position
-    
+
             let dragStart = { x: 0, y: 0 };
             let offsetX, offsetY;
-    
+
             circle.addEventListener('mousedown', (e) => {
                 if (circle.dataset.dragged === 'true') return;
-    
+
                 dragStart = { x: e.clientX, y: e.clientY };
                 offsetX = e.clientX - circle.offsetLeft;
                 offsetY = e.clientY - circle.offsetTop;
-    
+
                 circle.classList.add('dragging');
                 updateOutput('Drag Start', `X: ${dragStart.x}, Y: ${dragStart.y}`);
-    
+
                 document.addEventListener('mousemove', handleDragMove);
                 document.addEventListener('mouseup', handleDragEnd);
             });
-    
+
             function handleDragMove(e) {
                 const newX = e.clientX - offsetX;
                 const newY = e.clientY - offsetY;
                 circle.style.left = `${newX}px`;
                 circle.style.top = `${newY}px`;
             }
-    
+
             function handleDragEnd(e) {
                 const dragEnd = { x: e.clientX, y: e.clientY };
                 const index = totalCircles - 1; // Index of the current circle
-    
+
                 if (circle.dataset.dragged === 'false') {
                     if (Math.abs(dragEnd.x - dragStart.x) > 5 || Math.abs(dragEnd.y - dragStart.y) > 5) {
                         circle.style.backgroundColor = 'green';
                         circle.dataset.dragged = 'true';
                         totalDrags++;
-                        dragCountDiv.innerHTML = `Total Drags on Circles: ${totalDrags}`;
-    
+                        updateProgressDisplay(); // Update progress display after a successful drag
+
                         // Update dragPositions for this circle
                         dragPositions[index] = { startX: dragStart.x, startY: dragStart.y, endX: dragEnd.x, endY: dragEnd.y };
                     }
                 }
-    
+
                 circle.classList.remove('dragging');
                 document.removeEventListener('mousemove', handleDragMove);
                 document.removeEventListener('mouseup', handleDragEnd);
             }
-    
+
             document.body.appendChild(circle);
             totalCircles++;
-    
+            updateProgressDisplay(); // Update progress display after a circle is created
+
             setTimeout(() => {
                 circle.remove();
                 if (totalCircles === num_circles) {
@@ -99,21 +106,21 @@
                 }
             }, 3000);
         }
-    
+
         const circleInterval = setInterval(() => {
             createRandomCircle();
             if (totalCircles >= num_circles) {
                 clearInterval(circleInterval);
             }
         }, 3000);
-    
+
         function showResult() {
             const successRate = ((totalDrags / totalCircles) * 100).toFixed(2);
             resultDiv.innerHTML = `Success Rate: ${successRate}%`;
             resultDiv.style.display = 'block';
             mainButton.style.display = 'block';
         }
-    
+
         mainButton.addEventListener('click', () => {
             const data = {
                 totalDrags: totalDrags,
@@ -122,7 +129,7 @@
                 dragPositions: dragPositions,
                 testType: 'drag',
             };
-    
+
             fetch('/save_results', {
                 method: 'POST',
                 headers: {
@@ -137,19 +144,21 @@
                         mainButton.style.display = 'none';
                         totalDrags = 0;
                         totalCircles = 0;
-                        dragCountDiv.innerHTML = `Total Drags on Circles: ${totalDrags}`;
+                        dragCountDiv.innerHTML = `Test Progress: ${totalCircles} / ${num_circles} | Successful Drags: ${totalDrags}`;
                         outputDiv.innerHTML = 'Mouse coordinates will appear here';
-    
+
                         // Clear stored positions for a new test
                         circlePositions.length = 0;
                         dragPositions.length = 0;
-    
+
                         window.location.href = '/';
                     }
                 })
                 .catch((error) => console.error('Error:', error));
         });
+
     </script>
-    
+
 </body>
+
 </html>
