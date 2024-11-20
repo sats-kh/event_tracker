@@ -1,0 +1,7 @@
+Index,Circle X,Circle Y,Swipe-startX,Swipe-startY,Swipe-endX,Swipe-endY,Result
+1,123.16,395.60,188.00,458.00,251.00,305.00,1
+2,75.48,161.19,0,0,0,0,0
+3,46.97,343.62,136.00,390.00,274.00,267.00,1
+
+Total Swipes,Total Circles,Success Rate (%)
+2,3,66.67

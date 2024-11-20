@@ -25,6 +25,7 @@
         const num_circles = 50; // Total number of circle pairs for the test
         const circlePositions = [];
         const swipePositions = [];
+        let results = [];
 
         // Update progress display
         function updateProgressDisplay() {
@@ -37,7 +38,10 @@
 
         function createCirclePair() {
             if (totalPairs >= num_circles) return; // Stop creating new pairs if totalPairs reaches num_circles
-
+            if (results.length === 0) {
+                // Initialize results array with zeros
+                results = new Array(num_circles).fill(0);
+            };
             totalPairs++; // Increment totalPairs immediately to avoid multiple executions
             updateProgressDisplay(); // Update progress display when a new pair is created
 
@@ -126,12 +130,15 @@
             }
 
             function handleTouchEnd() {
+                const index = totalPairs - 1; // Index of the current pair
+
                 if ((movedCircle1 || movedCircle2) && circle1.dataset.swiped === "false" && circle2.dataset.swiped === "false") {
                     circle1.style.backgroundColor = 'green';
                     circle2.style.backgroundColor = 'green';
                     circle1.dataset.swiped = "true"; // Mark as swiped
                     circle2.dataset.swiped = "true"; // Mark as swiped
                     totalSwipes++;
+                    results[index] = 1; // Update results for this index to success
                     updateProgressDisplay(); // Update progress display after a successful swipe
                 }
 
@@ -170,6 +177,7 @@
                 circlePositions: circlePositions,
                 swipePositions: swipePositions,
                 testType: 'two-finger-swipe',
+                results: results,
             };
 
             fetch('/save_results', {

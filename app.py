@@ -40,21 +40,22 @@ def write_click_data(data):
     total_circles = data.get('totalCircles', 10)
     circle_positions = data.get('circlePositions', [])
     click_positions = data.get('clickPositions', [])
-
+    results = data.get('results', [])
     # Ensure synchronized positions
     for _ in range(len(circle_positions) - len(click_positions)):
         click_positions.append({'x': 0, 'y': 0})
 
     # Prepare rows for CSV
     data_rows = [
-        [index + 1, pos['x'], pos['y'], click['x'], click['y']]
-        for index, (pos, click) in enumerate(zip(circle_positions, click_positions))
+        [index + 1, pos['x'], pos['y'], click['x'], click['y'], result]
+        for index, (pos, click, result) in enumerate(zip(circle_positions, click_positions, results))
     ]
     summary_header = ['Total Clicks', 'Total Circles', 'Success Rate (%)']
     summary_data = [total_clicks, total_circles, round((total_clicks / total_circles) * 100, 2)]
 
     filename = generate_filename('click')
-    write_data_to_csv(filename, ['Index', 'Circle X', 'Circle Y', 'User X', 'User Y'], data_rows, summary_header, summary_data)
+    header = ['Index', 'Circle X', 'Circle Y', 'User X', 'User Y', 'Result']
+    write_data_to_csv(filename, header, data_rows, summary_header, summary_data)
 
 
 def write_drag_data(data):
@@ -63,21 +64,22 @@ def write_drag_data(data):
     total_circles = data.get('totalCircles', 10)
     circle_positions = data.get('circlePositions', [])
     drag_positions = data.get('dragPositions', [])
-
+    results = data.get('results', [])
     # Ensure synchronized positions
     for _ in range(len(circle_positions) - len(drag_positions)):
         drag_positions.append({'startX': 0, 'startY': 0, 'endX': 0, 'endY': 0})
 
     # Prepare rows for CSV
     data_rows = [
-        [index + 1, pos['x'], pos['y'], drag['startX'], drag['startY'], drag['endX'], drag['endY']]
-        for index, (pos, drag) in enumerate(zip(circle_positions, drag_positions))
+        [index + 1, pos['x'], pos['y'], drag['startX'], drag['startY'], drag['endX'], drag['endY'], result]
+        for index, (pos, drag, result) in enumerate(zip(circle_positions, drag_positions, results))
     ]
     summary_header = ['Total Drags', 'Total Circles', 'Success Rate (%)']
     summary_data = [total_drags, total_circles, round((total_drags / total_circles) * 100, 2)]
 
     filename = generate_filename('drag')
-    write_data_to_csv(filename, ['Index', 'Circle X', 'Circle Y', 'User-startX', 'User-startY', 'User-endX', 'User-endY'], data_rows, summary_header, summary_data)
+    header = ['Index', 'Circle X', 'Circle Y', 'User-startX', 'User-startY', 'User-endX', 'User-endY', 'Results']
+    write_data_to_csv(filename, header, data_rows, summary_header, summary_data)
 
 def write_swipe_data(data):
     """Process and write swipe data to a CSV file."""
@@ -85,21 +87,22 @@ def write_swipe_data(data):
     total_circles = data.get('totalCircles', 10)
     circle_positions = data.get('circlePositions', [])
     swipe_positions = data.get('swipePositions', [])
-
+    results = data.get('results', [])
     # Ensure synchronized positions
     for _ in range(len(circle_positions) - len(swipe_positions)):
         swipe_positions.append({'startX': 0, 'startY': 0, 'endX': 0, 'endY': 0})
 
     # Prepare rows for CSV
     data_rows = [
-        [index + 1, pos['x'], pos['y'], swipe['startX'], swipe['startY'], swipe['endX'], swipe['endY']]
-        for index, (pos, swipe) in enumerate(zip(circle_positions, swipe_positions))
+        [index + 1, pos['x'], pos['y'], swipe['startX'], swipe['startY'], swipe['endX'], swipe['endY'], result]
+        for index, (pos, swipe, result) in enumerate(zip(circle_positions, swipe_positions, results))
     ]
     summary_header = ['Total Swipes', 'Total Circles', 'Success Rate (%)']
     summary_data = [total_swipes, total_circles, round((total_swipes / total_circles) * 100, 2)]
 
     filename = generate_filename('swipe')
-    write_data_to_csv(filename, ['Index', 'Circle X', 'Circle Y', 'Swipe-startX', 'Swipe-startY', 'Swipe-endX', 'Swipe-endY'], data_rows, summary_header, summary_data)
+    header = ['Index', 'Circle X', 'Circle Y', 'Swipe-startX', 'Swipe-startY', 'Swipe-endX', 'Swipe-endY', 'Result']
+    write_data_to_csv(filename, header, data_rows, summary_header, summary_data)
 
 def write_two_finger_swipe_data(data):
     """Process and write two-finger swipe data to a CSV file."""
@@ -107,6 +110,7 @@ def write_two_finger_swipe_data(data):
     total_pairs = data.get('totalPairs', 10)
     circle_positions = data.get('circlePositions', [])
     swipe_positions = data.get('swipePositions', [])
+    results = data.get('results', [])
 
     # Prepare rows for CSV
     data_rows = [
@@ -115,28 +119,17 @@ def write_two_finger_swipe_data(data):
             pair['Circle1']['x'], pair['Circle1']['y'],
             pair['Circle2']['x'], pair['Circle2']['y'],
             swipe['Circle1']['Circle1_startX'], swipe['Circle1']['Circle1_startY'], swipe['Circle1']['Circle1_endX'], swipe['Circle1']['Circle1_endY'],
-            swipe['Circle2']['Circle2_startX'], swipe['Circle2']['Circle2_startY'], swipe['Circle2']['Circle2_endX'], swipe['Circle2']['Circle2_endY']
+            swipe['Circle2']['Circle2_startX'], swipe['Circle2']['Circle2_startY'], swipe['Circle2']['Circle2_endX'], swipe['Circle2']['Circle2_endY'],
+            result
         ]
-        for index, (pair, swipe) in enumerate(zip(circle_positions, swipe_positions))
+        for index, (pair, swipe, result) in enumerate(zip(circle_positions, swipe_positions, results))
     ]
     summary_header = ['Total Swipes', 'Total Pairs', 'Success Rate (%)']
     success_rate = round((total_swipes / total_pairs) * 100, 2) if total_pairs > 0 else 0
     summary_data = [total_swipes, total_pairs, f"{success_rate:.2f}"]
-
+    header = ['Index','Circle1 X', 'Circle1 Y','Circle2 X', 'Circle2 Y','Start X1', 'Start Y1', 'End X1', 'End Y1','Start X2','Start Y2', 'End X2', 'End Y2', 'Results']
     filename = generate_filename('two_finger_swipe')
-    write_data_to_csv(
-        filename,
-        [
-            'Index',
-            'Circle1 X', 'Circle1 Y',
-            'Circle2 X', 'Circle2 Y',
-            'Start X1', 'Start Y1', 'End X1', 'End Y1',
-            'Start X2', 'Start Y2', 'End X2', 'End Y2'
-        ],
-        data_rows,
-        summary_header,
-        summary_data
-    )
+    write_data_to_csv(filename, header, data_rows, summary_header, summary_data)
 
 @app.route('/')
 def index():

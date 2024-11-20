@@ -25,6 +25,7 @@
         let totalSwipes = 0;
         let totalCircles = 0;
         const num_circles = 50; // Adjust this for the total number of circles
+        let results = [];
 
         function updateOutput(eventType, info) {
             outputDiv.innerHTML = `Event: ${eventType}, ${info}`;
@@ -37,7 +38,10 @@
 
         function createRandomCircle() {
             if (totalCircles >= num_circles) return;
-
+            if (results.length === 0) {
+                // Initialize results array with zeros
+                results = new Array(num_circles).fill(0);
+            }
             const circle = document.createElement('div');
             circle.classList.add('circle');
             circle.dataset.swiped = 'false'; // Track swipe status
@@ -47,6 +51,7 @@
             circle.style.left = `${x}px`;
             circle.style.top = `${y}px`;
 
+            const index = totalCircles; // Assign the current circle index
             circlePositions.push({ x: x.toFixed(2), y: y.toFixed(2) });
             swipePositions.push({ startX: 0, startY: 0, endX: 0, endY: 0 }); // Default swipe position
 
@@ -80,9 +85,17 @@
                         circle.style.backgroundColor = 'green';
                         circle.dataset.swiped = 'true';
                         totalSwipes++;
+                        results[index] = 1; // Update results for this index to success
+
+                        // Update swipePositions for this index
+                        swipePositions[index] = {
+                            startX: swipeStart.x.toFixed(2),
+                            startY: swipeStart.y.toFixed(2),
+                            endX: swipeEnd.x.toFixed(2),
+                            endY: swipeEnd.y.toFixed(2),
+                        };
+
                         updateProgressDisplay(); // Update progress display after a successful swipe
-                        const index = totalCircles - 1;
-                        swipePositions[index] = { startX: swipeStart.x, startY: swipeStart.y, endX: swipeEnd.x, endY: swipeEnd.y };
                     }
                 }
 
@@ -97,14 +110,18 @@
 
             setTimeout(() => {
                 circle.remove();
+
+                // Ensure failed swipes are not counted as successful
                 if (swipePositions.length < totalCircles) {
-                    swipePositions[totalCircles - 1] = { startX: 0, startY: 0, endX: 0, endY: 0 };
+                    swipePositions[index] = { startX: 0, startY: 0, endX: 0, endY: 0 };
                 }
+
                 if (totalCircles === num_circles) {
                     setTimeout(showResult, 3800);
                 }
             }, 3000);
         }
+
 
         const circleInterval = setInterval(() => {
             createRandomCircle();
@@ -127,6 +144,7 @@
                 circlePositions: circlePositions,
                 swipePositions: swipePositions,
                 testType: 'swipe',
+                results: results,
             };
 
             fetch('/save_results', {

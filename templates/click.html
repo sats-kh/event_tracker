@@ -25,6 +25,7 @@
         let totalClicks = 0;
         let totalCircles = 0;
         const num_circles = 50; // Adjust this for the number of total circles
+        let results = [];
 
         function updateOutput(eventType, info) {
             outputDiv.innerHTML = `Event: ${eventType}, ${info}`;
@@ -47,7 +48,10 @@
 
         function createRandomCircle() {
             if (totalCircles >= num_circles) return;
-
+            if (results.length === 0) {
+                // Initialize results array with zeros
+                results = new Array(num_circles).fill(0);
+            }
             const circle = document.createElement('div');
             circle.classList.add('circle');
 
@@ -71,7 +75,9 @@
                     clickPositions[index] = { x: e.clientX, y: e.clientY };
                     circle.style.backgroundColor = 'green';
                     updateProgressDisplay();
+                    results[index] = 1; // Update results for this index to success
                 }
+
             });
 
             document.body.appendChild(circle);
@@ -80,6 +86,7 @@
 
             setTimeout(() => {
                 circle.remove();
+
                 if (totalCircles === num_circles) {
                     setTimeout(showResult, 3800);
                 }
@@ -105,8 +112,9 @@
                 circlePositions: circlePositions,
                 clickPositions: clickPositions,
                 testType: 'click',
+                results: results,
             };
-
+            
             fetch('/save_results', {
                 method: 'POST',
                 headers: {
